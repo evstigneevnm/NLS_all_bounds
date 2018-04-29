@@ -5,8 +5,8 @@
 #include <stdlib.h>
 #include "Macros.h"
 
-void read_control_file(int N, real* x1_Re, real* x1_Im, real* x2_Re, real* x2_Im, real* x3_Re, real* x3_Im, real* x4_Re, real* x4_Im);
-void write_control_file(int N, real* x1_Re, real* x1_Im, real* x2_Re, real* x2_Im, real* x3_Re, real* x3_Im, real* x4_Re, real* x4_Im);
+void read_control_file(char *f_name, int N, real* x1_Re, real* x1_Im, real* x2_Re, real* x2_Im, real* x3_Re, real* x3_Im, real* x4_Re, real* x4_Im);
+void write_control_file(char *f_name, int N, real* x1_Re, real* x1_Im, real* x2_Re, real* x2_Im, real* x3_Re, real* x3_Im, real* x4_Re, real* x4_Im);
 void write_file(char* file_name, real *array, int Nx, int Ny, real dx, real dy);
 void write_file_matrix(char *file_name, real *Matrix, int Nx, int Ny);
 

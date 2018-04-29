@@ -16,8 +16,8 @@ void all_complex_2_real(dim3 dimBlock, dim3 dimGrid, real* x1_Re_d, real* x1_Im_
 
 void Domain_To_Image(cufftHandle planR2C, real* x1_d, cudaComplex *x1_hat, real* x2_d, cudaComplex *x2_hat, real* x3_d, cudaComplex *x3_hat, real* x4_d, cudaComplex *x4_hat);
 void Image_to_Domain(dim3 dimGridD, dim3 dimBlockD, cufftHandle planC2R, int N, real* x1_d, cudaComplex *x1_hat, real* x2_d, cudaComplex *x2_hat, real* x3_d, cudaComplex *x3_hat, real* x4_d, cudaComplex *x4_hat);
-void build_Laplace_Wavenumbers(int N,  real L, real *k_laplace);
-void build_mask_matrix(int N,  real L, real *mask_2_3);
+void build_Laplace_Wavenumbers(int N,  real L, real *k_laplace, char boundary);
+void build_mask_matrix(int N,  real L, real *mask_2_3, char boundary);
 
 
 #endif

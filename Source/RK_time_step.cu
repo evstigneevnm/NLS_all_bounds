@@ -90,7 +90,35 @@ unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
 }
 
 
+__global__ void select_sin_transfer(int N, cudaComplex *x1_hat, cudaComplex *x2_hat, cudaComplex *x3_hat, cudaComplex *x4_hat){
 
+unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
+    if(j<N){
+
+        x1_hat[j].x=0.0;//x1_hat[j].x+wight*RHS1[j].x;
+        x2_hat[j].x=0.0;//x2_hat[j].x+wight*RHS2[j].x;
+        x3_hat[j].x=0.0;//x3_hat[j].x+wight*RHS3[j].x;
+        x4_hat[j].x=0.0;//x4_hat[j].x+wight*RHS4[j].x;
+
+    }
+
+}
+
+
+__global__ void select_cos_transfer(int N, cudaComplex *x1_hat, cudaComplex *x2_hat, cudaComplex *x3_hat, cudaComplex *x4_hat){
+
+unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
+    if(j<N){
+
+
+        x1_hat[j].y=0.0;//x1_hat[j].y+wight*RHS1[j].y;
+        x2_hat[j].y=0.0;//x2_hat[j].y+wight*RHS2[j].y;
+        x3_hat[j].y=0.0;//x3_hat[j].y+wight*RHS3[j].y;
+        x4_hat[j].y=0.0;//x4_hat[j].y+wight*RHS4[j].y;
+
+    }
+
+}
 
 
 void RightHandSide(dim3 dimGridD, dim3 dimBlockD, dim3 dimGridI, dim3 dimBlockI, cufftHandle planR2C, cufftHandle planC2R, int N, int M, real dt, real g, cudaComplex *x1_hat, cudaComplex *x2_hat, cudaComplex *x3_hat, cudaComplex *x4_hat, cudaComplex *RHS1, cudaComplex *RHS2, cudaComplex *RHS3, cudaComplex *RHS4, cudaComplex *x3_hat_cut, cudaComplex *x4_hat_cut,  real *x3_c, real *x4_c, real *Q3_mul, real *Q4_mul, cudaComplex *Q3_hat_mul, cudaComplex *Q4_hat_mul, real *mask_2_3_d, real *k_laplace_d){
@@ -105,6 +133,8 @@ void RightHandSide(dim3 dimGridD, dim3 dimBlockD, dim3 dimGridI, dim3 dimBlockI,
 
 void RK4_single_step(dim3 dimGridD, dim3 dimBlockD, dim3 dimGridI, dim3 dimBlockI, cufftHandle planR2C, cufftHandle planC2R, int N, int M, real dt, real g, cudaComplex *x1_hat, cudaComplex *x2_hat, cudaComplex *x3_hat, cudaComplex *x4_hat, cudaComplex *x1_p, cudaComplex *x2_p, cudaComplex *x3_p, cudaComplex *x4_p, cudaComplex *x3_hat_cut, cudaComplex *x4_hat_cut,  real *x3_c, real *x4_c, real *Q3_mul, real *Q4_mul, cudaComplex *Q3_hat_mul, cudaComplex *Q4_hat_mul, real *mask_2_3_d, real *k_laplace_d, cudaComplex *RHS1_1, cudaComplex *RHS2_1, cudaComplex *RHS3_1, cudaComplex *RHS4_1, cudaComplex *RHS1_2, cudaComplex *RHS2_2, cudaComplex *RHS3_2, cudaComplex *RHS4_2, cudaComplex *RHS1_3, cudaComplex *RHS2_3, cudaComplex *RHS3_3, cudaComplex *RHS4_3, cudaComplex *RHS1_4, cudaComplex *RHS2_4, cudaComplex *RHS3_4, cudaComplex *RHS4_4){
 
+
+    //select_sin_transfer<<<dimGridI, dimBlockI>>>(M, x1_hat, x2_hat, x3_hat, x4_hat);
 
 //K1:
     RightHandSide(dimGridD, dimBlockD, dimGridI, dimBlockI, planR2C, planC2R, N, M, dt, g, x1_hat, x2_hat, x3_hat, x4_hat, RHS1_1, RHS2_1, RHS3_1, RHS4_1, x3_hat_cut, x4_hat_cut,  x3_c, x4_c, Q3_mul, Q4_mul, Q3_hat_mul, Q4_hat_mul, mask_2_3_d, k_laplace_d);
@@ -127,3 +157,5 @@ void RK4_single_step(dim3 dimGridD, dim3 dimBlockD, dim3 dimGridI, dim3 dimBlock
     single_RK4_step_device<<<dimGridI, dimBlockI>>>(M,  RHS1_1, RHS2_1, RHS3_1, RHS4_1, RHS1_2, RHS2_2, RHS3_2, RHS4_2, RHS1_3, RHS2_3, RHS3_3, RHS4_3, RHS1_4, RHS2_4, RHS3_4, RHS4_4, x1_hat, x2_hat, x3_hat, x4_hat);
 
 }
+
+

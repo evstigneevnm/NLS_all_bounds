@@ -16,6 +16,8 @@
 	#define I(i,j) (i)*(Ny)+(j)
 #endif
 
+
+
 //* Type redifinition!
 #define real double
 
