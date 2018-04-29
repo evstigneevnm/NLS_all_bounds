@@ -1,13 +1,32 @@
 #include "Rosenbrock_time_step.h"
 
-void print_matrix(int batch_size, real *matrix, int s)
+void print_matrix_extended(int batch_size, real *matrix, int s)
 {
     for (int ii1 = 0;ii1 < matrix_size;++ii1) {
         for (int ii2 = 0;ii2 < extended_matrix_size;++ii2) {
-            printf("%le ", matrix[IMB(s,ii1,ii2)]);
+            printf("%le,", matrix[IMB(s,ii1,ii2)]);
         }
-        printf("\n");
+        printf(";\n");
     }
+}
+void print_matrix(int batch_size, real *matrix, int s)
+{
+    for (int ii1 = 0;ii1 < matrix_size;++ii1) {
+        for (int ii2 = 0;ii2 < matrix_size;++ii2) {
+            printf("%le,", matrix[IMB(s,ii1,ii2)]);
+        }
+        printf(";\n");
+    }
+}
+
+void print_solution(int batch_size, real *matrix, int s)
+{
+        printf("[");
+        for (int ii1 = 0;ii1 < matrix_size;++ii1) {
+                printf("%le,", matrix[IMB(s,ii1,extended_matrix_size-1)]); 
+        }
+        printf("]\n");
+
 }
 
 
@@ -145,10 +164,10 @@ void construct_implicit_matrix(int batch_size, real *m_in, real g,  real *k_lapl
         m_in[IMB(s,3,3)] = g - lka;
        
         //set RHS 
-        m_in[IMB(s,0,4)] = 0.0;
-        m_in[IMB(s,1,4)] = 0.0;
-        m_in[IMB(s,2,4)] = 0.0;
-        m_in[IMB(s,3,4)] = 0.0;
+        m_in[IMB(s,0,4)] = 2.0;
+        m_in[IMB(s,1,4)] = 3.0;
+        m_in[IMB(s,2,4)] = 4.0;
+        m_in[IMB(s,3,4)] = 5.0;
 
         for (int ii1 = 0;ii1 < matrix_size;++ii1){
             for (int ii2 = 0;ii2 < matrix_size;++ii2){
@@ -366,6 +385,7 @@ void RB3_single_step(dim3 dimGridD, dim3 dimBlockD, dim3 dimGridI, dim3 dimBlock
 void check_gauss(dim3 dimGridI, dim3 dimBlockI, int batch_size, real g,  real *k_laplace, real dt, cudaComplex *x1_hat, cudaComplex *x2_hat, cudaComplex *x3_hat, cudaComplex *x4_hat)
 {
 
+    int s = 0;
     real *M1, *M2, *M3, *m_out;
     real *M1_d, *M2_d, *M3_d, *m_out_d;
     real *iM1_d, *iM2_d, *iM3_d;
@@ -384,21 +404,34 @@ void check_gauss(dim3 dimGridI, dim3 dimBlockI, int batch_size, real g,  real *k
     //device_allocate_all_real(all_size, {M1_d, M2_d, M3_d, m_out_d});
     device_from_host_all_real_cpy(all_size, {M1_d, M2_d, M3_d}, {M1, M2, M3});
     
-    set_batch_rhs_re<<<dimGridI, dimBlockI>>>(batch_size, M1_d, x1_hat, x2_hat, x3_hat, x4_hat);
+    //set_batch_rhs_re<<<dimGridI, dimBlockI>>>(batch_size, M1_d, x1_hat, x2_hat, x3_hat, x4_hat);
 
     host_from_device_all_real_cpy(all_size, {M1}, {M1_d});
+    host_from_device_all_real_cpy(all_size, {M2}, {M1_d});
+    host_from_device_all_real_cpy(all_size, {M3}, {M1_d});
     //print matrices:
-    //print_matrix(batch_size, M1, 0);
+    print_matrix(batch_size, M1, s);
+    printf("\n");
+    print_matrix(batch_size, M2, s);
+    printf("\n");
+    print_matrix(batch_size, M3, s);
+    printf("\n");
 
     ker_gauss_elim<<<dimGridI, dimBlockI>>>(batch_size, M1_d, iM1_d);
+    ker_gauss_elim<<<dimGridI, dimBlockI>>>(batch_size, M2_d, iM2_d);
+    ker_gauss_elim<<<dimGridI, dimBlockI>>>(batch_size, M3_d, iM3_d);
 
-    get_batch_sol_re<<<dimGridI, dimBlockI>>>(batch_size, iM1_d, x1_hat, x2_hat, x3_hat, x4_hat);
+    //get_batch_sol_re<<<dimGridI, dimBlockI>>>(batch_size, iM1_d, x1_hat, x2_hat, x3_hat, x4_hat);
 
-    host_from_device_all_real_cpy(all_size, {iM1}, {iM1_d});
+    host_from_device_all_real_cpy(all_size, {iM1, iM2, iM3}, {iM1_d, iM2_d, iM3_d});
     device_deallocate_all({M1_d, M2_d, M3_d, m_out_d, iM1_d, iM2_d, iM3_d});
 
     //print matrices:
-    print_matrix(batch_size, iM1, 0);
+    //print_matrix_extended(batch_size, iM1, s);
+    
+    print_solution(batch_size, iM1, s);
+    print_solution(batch_size, iM2, s);
+    print_solution(batch_size, iM3, s);
 
 
     deallocate_real(7, M1, M2, M3, m_out, iM1, iM2, iM3);

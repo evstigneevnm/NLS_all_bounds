@@ -47,10 +47,11 @@ unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
 
 
 
-__global__ void assemble_NLS_device(int N, real dt, real g, cudaComplex *x1_hat, cudaComplex *x2_hat, cudaComplex *x3_hat, cudaComplex *x4_hat, cudaComplex *RHS1, cudaComplex *RHS2, cudaComplex *RHS3, cudaComplex *RHS4, cudaComplex *Q3_hat_mul, cudaComplex *Q4_hat_mul, real *k_laplace_d){
+__global__ void assemble_NLS_device(int N, real dt, real g, cudaComplex *x1_hat, cudaComplex *x2_hat, cudaComplex *x3_hat, cudaComplex *x4_hat, cudaComplex *RHS1, cudaComplex *RHS2, cudaComplex *RHS3, cudaComplex *RHS4, cudaComplex *Q3_hat_mul, cudaComplex *Q4_hat_mul, real *k_laplace_d)
+{
 
 unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
-    if(j<N){
+    if (!(j < N)) return;
 
         RHS1[j].x=dt*(-0.5*k_laplace_d[j]/betta*x2_hat[j].x-(lka*x1_hat[j].x-delta_betta*x2_hat[j].x+kappa*x4_hat[j].x));
         RHS1[j].y=dt*(-0.5*k_laplace_d[j]/betta*x2_hat[j].y-(lka*x1_hat[j].y-delta_betta*x2_hat[j].y+kappa*x4_hat[j].y));
@@ -63,7 +64,7 @@ unsigned int j = blockIdx.x * blockDim.x + threadIdx.x;
 
         RHS4[j].x=dt*(0.5*k_laplace_d[j]/betta*x3_hat[j].x-(-kappa*x1_hat[j].x+(lka-g)*x4_hat[j].x-delta_betta*x3_hat[j].x)-Q4_hat_mul[j].x);   
         RHS4[j].y=dt*(0.5*k_laplace_d[j]/betta*x3_hat[j].y-(-kappa*x1_hat[j].y+(lka-g)*x4_hat[j].y-delta_betta*x3_hat[j].y)-Q4_hat_mul[j].y);   
-    }
+
 
 }
 

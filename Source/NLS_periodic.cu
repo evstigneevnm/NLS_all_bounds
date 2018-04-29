@@ -42,15 +42,20 @@ void Initial_conditions(int N, real* x1,real* x2,real* x3, real* x4){
     int j;
 
     FS
-         x1[j]=0.31379418035549456+1e-6*sin(2*PI*j/N);
-         x2[j]=-0.34486184665357905;  
-         x3[j]=0.67671457773023869;
-         x4[j]=-1.3908982860701657;
+         // x1[j]=0.31379418035549456+1e-6*sin(2*PI*j/N);
+         // x2[j]=-0.34486184665357905;  
+         // x3[j]=0.67671457773023869;
+         // x4[j]=-1.3908982860701657;
         
         //x1[j]=1e-4*sin(2.0*j/N);
         //x2[j]=1e-8*sin(3.0*j/N);
         //x3[j]=1e-8*sin(4.0*j/N);
         //x4[j]=1e-8*sin(5.0*j/N);
+
+         x1[j]=0.31379418035549456+1e-6*sin(2*PI*j/N);
+         x2[j]=-0.34486184665357905;  
+         x3[j]=0.67671457773023869;
+         x4[j]=-0.3908982860701657;
 
 
     FE
@@ -152,7 +157,7 @@ int main (int argc, char *argv[])
     //estimate timestep
     real dx=L/N;
     real dt=min2(0.07*dx,1.0e-1);
-    //dt=0.05;
+    //dt=0.1;
     printf("N=%i, M=%i, dx=%f, dt=%f\n",N,M,dx,dt);
     //host arrays for physical space
     real *x1,* x2, *x3, *x4;
@@ -329,6 +334,9 @@ int main (int argc, char *argv[])
 
     if(method==2)
         init_matrices_Rosenbrock(M, g, k_laplace, dt, M1, M2, M3, M1_d, M2_d, M3_d, iM_d, x1b_hat, x2b_hat, x3b_hat, x4b_hat, x1c_hat, x2c_hat, x3c_hat, x4c_hat);
+
+    
+    check_gauss(dimGridI, dimBlockI, M, g,  k_laplace, dt, x1_hat, x2_hat, x3_hat, x4_hat);
 
     printf("\n===calculating===\n");
     gettimeofday(&start, NULL);
